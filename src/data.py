@@ -3,6 +3,7 @@ from pathlib import Path
 import pandas as pd
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "UNSW-NB15"
+SPLITS_DIR = DATA_DIR / "Training and Testing Sets"
 CACHE_DIR = DATA_DIR / ".cache"
 
 
@@ -23,3 +24,9 @@ def load_files(count: int) -> pd.DataFrame:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     df.to_pickle(cache_path)
     return df
+
+
+def load_splits() -> tuple[pd.DataFrame, pd.DataFrame]:
+    train = pd.read_csv(SPLITS_DIR / "UNSW_NB15_training-set.csv")
+    test = pd.read_csv(SPLITS_DIR / "UNSW_NB15_testing-set.csv")
+    return train, test
