@@ -32,7 +32,6 @@ def eval_rule(df, rule: Rule):
 
     cat = df["attack_cat"]
 
-    # metrics(df["Label"] == 1, "binary")
     metrics(cat == rule.name, f"cat={rule.name}")
 
     flagged_counts = cat[rule_mask].value_counts(dropna=False)

@@ -16,7 +16,7 @@ def load_files(count: int) -> pd.DataFrame:
     dfs = [pd.read_csv(f, header=None, low_memory=False) for f in files]
     df = pd.concat(dfs, ignore_index=True)
     features = pd.read_csv(DATA_DIR / "NUSW-NB15_features.csv", encoding="latin-1")
-    df.columns = features["Name"].values
+    df.columns = features["Name"].to_numpy()
 
     # NaN attack_cat means benign; strip handles stray whitespace like "Reconnaissance ".
     df["attack_cat"] = df["attack_cat"].fillna("Normal").str.strip()
