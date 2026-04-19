@@ -60,7 +60,7 @@ def feature_distribution(df: pd.DataFrame, feature: str, category: str) -> pd.Da
     qs = [0.01, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.99]
     rows = {}
     for label, s in groups.items():
-        stats = s.quantile(qs).to_dict()
+        stats = {f"p{int(q * 100)}": s.quantile(q) for q in qs}
         stats["min"] = s.min()
         stats["max"] = s.max()
         stats["mean"] = s.mean()
@@ -69,21 +69,6 @@ def feature_distribution(df: pd.DataFrame, feature: str, category: str) -> pd.Da
 
     cols = ["n", "min"] + [f"p{int(q * 100)}" for q in qs] + ["max", "mean"]
     out = pd.DataFrame(rows).T
-    out.columns = [
-        "p1",
-        "p5",
-        "p10",
-        "p25",
-        "p50",
-        "p75",
-        "p90",
-        "p95",
-        "p99",
-        "min",
-        "max",
-        "mean",
-        "n",
-    ]
     return out[cols]
 
 
