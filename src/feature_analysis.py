@@ -1,7 +1,5 @@
 import pandas as pd
 
-from data import load_files
-
 
 def compare_means(df: pd.DataFrame, category: str) -> pd.DataFrame:
     """Per-feature mean for `category` vs. other attacks vs. Normal.
@@ -72,29 +70,3 @@ def feature_distribution(df: pd.DataFrame, feature: str, category: str) -> pd.Da
     cols = ["n", "min"] + [f"p{int(q * 100)}" for q in qs] + ["max", "mean"]
     out = pd.DataFrame(rows).T
     return out[cols]
-
-
-def main():
-    # Load 2 CSV files from the dataset (enough to explore, not too slow).
-    df = load_files(2)
-    # Show every row/column without truncation so tables are readable.
-    pd.set_option("display.max_rows", None)
-    pd.set_option("display.max_columns", None)
-    pd.set_option("display.width", 240)
-    pd.set_option("display.float_format", "{:.4g}".format)
-
-    print("\n=== Reconnaissance: feature ranking ===")
-    print(compare_means(df, "Reconnaissance"))
-
-    # Top behavioural candidates from compare_means (skipping sttl/dttl —
-    # likely OS/testbed artifacts).
-    for feat in ["tcprtt", "ackdat", "synack", "ct_state_ttl"]:
-        print(f"\n=== Reconnaissance: {feat} distribution ===")
-        print(feature_distribution(df, feat, "Reconnaissance"))
-
-    print("\n=== DoS: feature ranking ===")
-    print(compare_means(df, "DoS"))
-
-
-if __name__ == "__main__":
-    main()

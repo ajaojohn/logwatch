@@ -1,10 +1,7 @@
-# Scratchpad for testing and experimenting with rule-based detection on UNSW-NB15.
 from dataclasses import dataclass
 from typing import Callable
 
 import pandas as pd
-
-from data import load_files
 
 
 @dataclass
@@ -58,14 +55,3 @@ RULES = [
         lambda d: (d["ct_state_ttl"] >= 1) & (d["Spkts"] > 20) & (d["sbytes"] > 9000),
     ),
 ]
-
-
-def main():
-    df = load_files(2)
-
-    for rule in RULES:
-        eval_rule(df, rule)
-
-
-if __name__ == "__main__":
-    main()
