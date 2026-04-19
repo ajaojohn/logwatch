@@ -50,9 +50,11 @@ def feature_distribution(df: pd.DataFrame, feature: str, category: str) -> pd.Da
 
     # Same three groups as compare_means, but only for the one feature.
     groups = {
-        "normal": col[cat == "Normal"], # rows of the attack we care about
-        "other_attacks": col[(df["Label"] == 1) & (cat != category)], # any other attack
-        category: col[cat == category], # benign traffic
+        "normal": col[cat == "Normal"],  # rows of the attack we care about
+        "other_attacks": col[
+            (df["Label"] == 1) & (cat != category)
+        ],  # any other attack
+        category: col[cat == category],  # benign traffic
     }
 
     # Percentiles show the shape of each group's distribution.

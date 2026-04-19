@@ -8,8 +8,18 @@ MAX_SAMPLES = 256  # subsample size per tree
 MAX_FEATURES = 1.0  # fraction of features per tree
 RANDOM_STATE = 42
 
-FEATURES = ["ct_state_ttl", "sbytes", "tcprtt", "sttl", "dttl",
-            "rate", "sload", "dload", "sinpkt", "dinpkt"]
+FEATURES = [
+    "ct_state_ttl",
+    "sbytes",
+    "tcprtt",
+    "sttl",
+    "dttl",
+    "rate",
+    "sload",
+    "dload",
+    "sinpkt",
+    "dinpkt",
+]
 
 
 def print_metrics(labels, pred_anomaly):
@@ -46,6 +56,11 @@ def run_general():
 
 def run_feature_selection():
     train, test = load_splits()
+
+    missing = [f for f in FEATURES if f not in train.columns or f not in test.columns]
+    if missing:
+        raise KeyError(f"FEATURES not found in splits: {missing}")
+
     X_train = train[FEATURES]
     X_test = test[FEATURES]
 
