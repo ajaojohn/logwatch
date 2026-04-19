@@ -34,16 +34,12 @@ def print_metrics(labels, pred_anomaly):
     print(f"Precision={prec:.4f} Recall={rec:.4f}")
 
 
-def run_general():
-    train, test = load_splits()
-    drop = ["id", "label", "attack_cat"]
-    X_train = train.drop(columns=drop).select_dtypes(include="number")
-    X_test = test.drop(columns=drop).select_dtypes(include="number")
-
+def run(X_train, X_test, y_test, contamination, label):
+    print(f"=== {label} ===")
     iso_forest = IsolationForest(
         n_estimators=N_ESTIMATORS,
         max_samples=MAX_SAMPLES,
-        contamination=0.5,
+        contamination=contamination,
         max_features=MAX_FEATURES,
         random_state=RANDOM_STATE,
     )
@@ -51,61 +47,26 @@ def run_general():
 
     preds = iso_forest.predict(X_test)
     pred_anomaly = (preds == -1).astype(int)
-    print_metrics(test["label"], pred_anomaly)
+    print_metrics(y_test, pred_anomaly)
 
 
-def run_feature_selection():
+def main():
     train, test = load_splits()
+    y_test = test["label"]
+    drop = ["id", "label", "attack_cat"]
+
+    X_train_all = train.drop(columns=drop).select_dtypes(include="number")
+    X_test_all = test.drop(columns=drop).select_dtypes(include="number")
+    run(X_train_all, X_test_all, y_test, 0.5, "General (all features, mixed training)")
 
     missing = [f for f in FEATURES if f not in train.columns or f not in test.columns]
     if missing:
         raise KeyError(f"FEATURES not found in splits: {missing}")
+    run(train[FEATURES], test[FEATURES], y_test, 0.5, "Feature selection")
 
-    X_train = train[FEATURES]
-    X_test = test[FEATURES]
-
-    iso_forest = IsolationForest(
-        n_estimators=N_ESTIMATORS,
-        max_samples=MAX_SAMPLES,
-        contamination=0.5,
-        max_features=MAX_FEATURES,
-        random_state=RANDOM_STATE,
-    )
-    iso_forest.fit(X_train)
-
-    preds = iso_forest.predict(X_test)
-    pred_anomaly = (preds == -1).astype(int)
-    print_metrics(test["label"], pred_anomaly)
-
-
-def run_normal_only():
-    train, test = load_splits()
-    drop = ["id", "label", "attack_cat"]
     normal = train[train["label"] == 0]
-    X_train = normal.drop(columns=drop).select_dtypes(include="number")
-    X_test = test.drop(columns=drop).select_dtypes(include="number")
-
-    iso_forest = IsolationForest(
-        n_estimators=N_ESTIMATORS,
-        max_samples=MAX_SAMPLES,
-        contamination=0.01,
-        max_features=MAX_FEATURES,
-        random_state=RANDOM_STATE,
-    )
-    iso_forest.fit(X_train)
-
-    preds = iso_forest.predict(X_test)
-    pred_anomaly = (preds == -1).astype(int)
-    print_metrics(test["label"], pred_anomaly)
-
-
-def main():
-    print("=== General (all features, mixed training) ===")
-    run_general()
-    print("\n=== Feature selection ===")
-    run_feature_selection()
-    print("\n=== Normal-only training ===")
-    run_normal_only()
+    X_train_normal = normal.drop(columns=drop).select_dtypes(include="number")
+    run(X_train_normal, X_test_all, y_test, 0.01, "Normal-only training")
 
 
 if __name__ == "__main__":
