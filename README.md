@@ -50,12 +50,13 @@ The loader in `src/data.py` resolves paths relative to the repo root, so this is
 
 ## Quickstart
 
+Uses [uv](https://docs.astral.sh/uv/) for environment and dependency management.
+
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 
 # after placing the dataset under data/UNSW-NB15/
-python src/rule_based_detect.py
-python src/isolation_forest_detect.py
+uv run src/rule_based_detect.py
+uv run src/isolation_forest_detect.py
 ```
